@@ -7,15 +7,19 @@ import tensorflow as tf
 
 app = FastAPI()
 
-MODEL=tf.keras.models.load_model("../Model/1",compile=False)
-CLASS_NAMES=["Cassava","Tomato"]
+MODEL = tf.keras.models.load_model("../Model/1", compile=False)
+CLASS_NAMES = ["Cassava", "Tomato"]
+
+
 @app.get("/ping")
 async def ping():
     return "oh! Yeahhhh"
 
+
 def read_file_as_image(data) -> np.ndarray:
-   image= np.array(Image.open(BytesIO(data)))
-   return image
+    image = np.array(Image.open(BytesIO(data)))
+    return image
+
 
 @app.post("/predict")
 async def predict(
@@ -25,12 +29,12 @@ async def predict(
     img_batch = np.expand_dims(image, 0)
     predictions = MODEL.predict(img_batch)
     predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
-    confidence=np.max(predictions[0])
-    return{
-        "class":predicted_class,
+    confidence = np.max(predictions[0])
+    return {
+        "class": predicted_class,
         "confidence": float(confidence)
     }
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host='localhost', port=8000)
+    uvicorn.run(app, host='localhost', port=8005)
